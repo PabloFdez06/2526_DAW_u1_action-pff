@@ -2,8 +2,11 @@ name: Generar Documentación Java
 
 on:
   push:
-    branches: [ main ]
-  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+permissions:
+  contents: write   # 👈 IMPORTANTE: permite que el bot pueda hacer commits/push
 
 jobs:
   build-docs:
