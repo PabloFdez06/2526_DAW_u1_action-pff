@@ -1,42 +1,71 @@
-name: Generar Documentación Java
+name: Generar Documentación Java (robusto)
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main", "master"]
+  pull_request:
   workflow_dispatch:
 
 permissions:
-  contents: write   # 👈 IMPORTANTE: permite que el bot pueda hacer commits/push
+  contents: write
 
 jobs:
   build-docs:
     runs-on: ubuntu-latest
 
     steps:
+      # Clonar el repositorio
       - name: Clonar repositorio
         uses: actions/checkout@v4
+        with:
+          persist-credentials: true
 
+      # Instalar Java
       - name: Instalar Java
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
 
+      # Instalar Pandoc
+      - name: Instalar Pandoc
+        run: sudo apt-get update && sudo apt-get install -y pandoc
+
+      # Generar documentación HTML con Javadoc
       - name: Generar documentación HTML con Javadoc
         run: |
+          echo "🔹 Generando Javadoc..."
           mkdir -p docs/html
-          javadoc -d docs/html -sourcepath src/main/java -subpackages org.example
+          if javadoc -d docs/html -sourcepath src/main/java -subpackages org.example; then
+            echo "✅ Javadoc generado correctamente."
+          else
+            echo "❌ Error generando Javadoc."
+            exit 1
+          fi
 
-      - name: Instalar Pandoc
-        run: sudo apt-get install -y pandoc
-
+      # Generar documentación PDF
       - name: Generar documentación en PDF
         run: |
+          echo "🔹 Generando PDF desde HTML..."
           mkdir -p docs/pdf
-          pandoc -s docs/html/index.html -o docs/pdf/documentacion.pdf
+          if pandoc -s docs/html/index.html -o docs/pdf/documentacion.pdf; then
+            echo "✅ PDF generado correctamente."
+          else
+            echo "❌ Error generando PDF."
+            exit 1
+          fi
 
-      - name: Subir documentación generada como artefacto
+      # Subir documentación como artefacto
+      - name: Subir documentación como artefacto
         uses: actions/upload-artifact@v4
         with:
           name: documentacion
           path: docs/
+
+      # Commit automático de docs/ al repositorio
+      - name: Commit automático de documentación
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "update: documentación generada automáticamente"
+          branch: ${{ github.ref_name }}
+          file_pattern: "docs/**"
