@@ -46,16 +46,16 @@ jobs:
           fi
 
       # Generar documentación PDF
-      - name: Generar documentación en PDF
+      - name: Generar documentación PDF
         run: |
-          echo "🔹 Generando PDF desde HTML..."
+          echo "🔹 Generando PDF desde los HTML de Main y Saludo..."
           mkdir -p docs/pdf
-          if pandoc -s docs/html/index.html -o docs/pdf/documentacion.pdf; then
-            echo "✅ PDF generado correctamente."
-          else
-            echo "❌ Error generando PDF."
-            exit 1
-          fi
+          # PDF individual por clase
+          pandoc -s docs/html/org/example/Main.html -o docs/pdf/Main.pdf
+          pandoc -s docs/html/org/example/Saludo.html -o docs/pdf/Saludo.pdf
+          # Combinar ambos en un solo documento (opcional)
+          pandoc docs/pdf/Main.pdf docs/pdf/Saludo.pdf -o docs/pdf/Documentacion_Completa.pdf
+          echo "✅ PDFs generados correctamente."
 
       # Subir documentación como artefacto
       - name: Subir documentación como artefacto
