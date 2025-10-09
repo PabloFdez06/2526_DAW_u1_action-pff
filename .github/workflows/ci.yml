@@ -1,0 +1,39 @@
+name: Generar Documentación Java
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  build-docs:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clonar repositorio
+        uses: actions/checkout@v4
+
+      - name: Instalar Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Generar documentación HTML con Javadoc
+        run: |
+          mkdir -p docs/html
+          javadoc -d docs/html -sourcepath src/main/java -subpackages org.example
+
+      - name: Instalar Pandoc
+        run: sudo apt-get install -y pandoc
+
+      - name: Generar documentación en PDF
+        run: |
+          mkdir -p docs/pdf
+          pandoc -s docs/html/index.html -o docs/pdf/documentacion.pdf
+
+      - name: Subir documentación generada como artefacto
+        uses: actions/upload-artifact@v4
+        with:
+          name: documentacion
+          path: docs/
