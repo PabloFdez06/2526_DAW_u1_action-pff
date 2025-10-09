@@ -27,12 +27,12 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      # Instalar Pandoc y LaTeX
+      # 3️⃣ Instalar Pandoc + LaTeX completo
       - name: Instalar Pandoc y LaTeX
         run: |
           sudo apt-get update
-          sudo apt-get install -y pandoc texlive-latex-base
-          
+          sudo apt-get install -y pandoc texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended
+
       # Generar documentación HTML con Javadoc
       - name: Generar documentación HTML con Javadoc
         run: |
@@ -44,7 +44,6 @@ jobs:
             echo "❌ Error generando Javadoc."
             exit 1
           fi
-
 
       # Generar documentación PDF
       - name: Generar documentación en PDF
@@ -58,7 +57,6 @@ jobs:
             exit 1
           fi
 
-
       # Subir documentación como artefacto
       - name: Subir documentación como artefacto
         uses: actions/upload-artifact@v4
@@ -66,7 +64,7 @@ jobs:
           name: documentacion
           path: docs/
 
-      # Commit automático de docs/ al repositorio
+      # Commit automático de documentación
       - name: Commit automático de documentación
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
