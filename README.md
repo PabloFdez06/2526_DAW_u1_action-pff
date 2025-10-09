@@ -1,0 +1,3 @@
+# README DE COMPROBACIÓN...
+
+proximamente añado contenido del proyecto.
