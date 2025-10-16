@@ -46,18 +46,16 @@ jobs:
           fi
 
       # Generar documentación PDF
-      - name: Generar documentación PDF (sin LaTeX)
+      - name: Generar documentación en PDF
         run: |
-          echo "🔹 Generando PDF desde los HTML de Main y Saludo (sin LaTeX)..."
+          echo "🔹 Generando PDF desde HTML..."
           mkdir -p docs/pdf
-          sudo apt-get install -y wkhtmltopdf
-          # Generar PDFs directamente desde HTML
-          wkhtmltopdf docs/html/org/example/Main.html docs/pdf/Main.pdf
-          wkhtmltopdf docs/html/org/example/Saludo.html docs/pdf/Saludo.pdf
-          # Combinar ambos en un solo documento (opcional)
-          pdftk docs/pdf/Main.pdf docs/pdf/Saludo.pdf cat output docs/pdf/Documentacion_Completa.pdf || echo "🔸 pdftk no disponible, se omite combinación"
-          echo "✅ PDFs generados correctamente."
-
+          if pandoc -s docs/html/index.html -o docs/pdf/documentacion.pdf; then
+            echo "✅ PDF generado correctamente."
+          else
+            echo "❌ Error generando PDF."
+            exit 1
+          fi
 
       # Subir documentación como artefacto
       - name: Subir documentación como artefacto
